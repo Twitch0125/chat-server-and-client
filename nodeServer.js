@@ -24,12 +24,21 @@ let server = net
     client.write(`your name is: ${newName}`);
     client.on("data", data => {
       log(`${newName}: ${data}\n`);
-      clients.forEach(currClient => {
-        //broadcast message to every user except the user that sent it
-        if (currClient.client != client) {
-          currClient.client.write(`${newName}: ${data}`);
-        }
-      });
+      let response = data.split(" ");
+      if (response.contains("/w")) {
+        let whisperTarget = clients.find(client => {
+          return client.name == response[1];
+        });
+        let message = response.splice(2).toString();
+        whisperTarget.write(`from${client}: ${message}`);
+      } else {
+        clients.forEach(currClient => {
+          //broadcast message to every user except the user that sent it
+          if (currClient.client != client) {
+            currClient.client.write(`${newName}: ${data}`);
+          }
+        });
+      }
     });
     client.on("close", () => {
       log(`${newName} has fled the server\n`);
