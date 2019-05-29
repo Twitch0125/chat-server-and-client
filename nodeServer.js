@@ -9,12 +9,15 @@ const serverStuff = fs.createWriteStream("chat.log");
 function log(data) {
   serverStuff.write(data, "UTF8");
 }
+function whisper(sender, receiver, message) {
+  receiver.write(`from ${sender.name}: ${message}`);
+}
 const encoding = "utf8";
 let server = net
   .createServer(client => {
     client.write("Hello! Welcome to the chat room! \n");
     let newId = uuidv4();
-    let newName = randomName();
+    let newName = randomName.first();
     log(`new dude: ${newName}\n`);
     clients.forEach(currClient => {
       currClient.client.write(`new dude: ${newName}`); //tell all other clients who the new person is
@@ -24,13 +27,15 @@ let server = net
     client.write(`your name is: ${newName}`);
     client.on("data", data => {
       log(`${newName}: ${data}\n`);
-      let response = data.split(" ");
-      if (response.contains("/w")) {
-        let whisperTarget = clients.find(client => {
-          return client.name == response[1];
+      if (data.includes("/w")) {
+        data.toString();
+        let command = data.split(" ");
+        let receiver = clients.find(client => {
+          client.name === command[1];
         });
-        let message = response.splice(2).toString();
-        whisperTarget.write(`from${client}: ${message}`);
+        command.splice(0, 2);
+        let message = command.forEach(word => (message = message + " " + word));
+        whisper(client, receiver, message);
       } else {
         clients.forEach(currClient => {
           //broadcast message to every user except the user that sent it
