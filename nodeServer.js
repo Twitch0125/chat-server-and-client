@@ -28,14 +28,14 @@ let server = net
     client.on("data", data => {
       log(`${newName}: ${data}\n`);
       if (data.includes("/w")) {
-        data.toString();
-        let command = data.split(" ");
+        let command = data.toString();
+        command = command.split(" ");
         let receiver = clients.find(client => {
-          client.name === command[1];
+          client.name == command[1];
         });
         command.splice(0, 2);
-        let message = command.forEach(word => (message = message + " " + word));
-        whisper(client, receiver, message);
+        let message = command.forEach(word => (message += " " + word));
+        whisper(client, receiver, command);
       } else {
         clients.forEach(currClient => {
           //broadcast message to every user except the user that sent it
