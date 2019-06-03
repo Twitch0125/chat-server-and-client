@@ -10,7 +10,7 @@ function log(data) {
   serverStuff.write(data, "UTF8");
 }
 function whisper(sender, receiver, message) {
-  receiver.write(`from ${sender.name}: ${message}`);
+  receiver.client.write(`from ${sender}: ${message}`);
 }
 const encoding = "utf8";
 let server = net
@@ -31,11 +31,15 @@ let server = net
         let command = data.toString();
         command = command.split(" ");
         let receiver = clients.find(client => {
-          client.name == command[1];
+          if (client.name == command[1]) {
+            return client.client;
+          }
         });
         command.splice(0, 2);
-        let message = command.forEach(word => (message += " " + word));
-        whisper(client, receiver, command);
+        const msgReducer = (accumulator, currentValue) =>
+          accumulator + " " + currentValue;
+        let message = command.reduce(msgReducer);
+        whisper(newName, receiver, message);
       } else {
         clients.forEach(currClient => {
           //broadcast message to every user except the user that sent it
