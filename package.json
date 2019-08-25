@@ -4,6 +4,8 @@
   "description": "",
   "main": "nodeClient.js",
   "scripts": {
+    "client": "node nodeClient.js",
+    "server": "node nodeServer.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
